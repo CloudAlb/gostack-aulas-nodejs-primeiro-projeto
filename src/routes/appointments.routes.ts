@@ -1,17 +1,10 @@
 import { Router } from "express";
-import { uuid } from "uuidv4";
 import { startOfHour, parseISO, isEqual } from "date-fns"; // yarn add date-fns
+import Appointment from '../models/Appointment';
 // startOfHour -> pega date e coloca uma hora no 0
 // parseISO -> converte uma data em string para data em tipo date do JS
 
 const appointmentsRouter = Router();
-
-// para evitar o erro de "any", defino a estrutura do objeto com uma interface
-interface Appointment {
-  id: string;
-  provider: string;
-  date: Date;
-}
 
 // antes, sem interface: "const appointments = [];""
 const appointments: Appointment[] = [];
@@ -34,11 +27,7 @@ appointmentsRouter.post("/", (request, response) => {
       .json({ message: "This appointment is already booked." });
   }
 
-  const appointment = {
-    id: uuid(),
-    provider,
-    date: parsedDate, // antes, tava dando erro: "date: parsedDate,"
-  };
+  const appointment = new Appointment(provider, parsedDate);
 
   appointments.push(appointment);
 
@@ -46,3 +35,7 @@ appointmentsRouter.post("/", (request, response) => {
 });
 
 export default appointmentsRouter;
+
+// mudanças
+// 1. não precisei criar um objeto appointment, apenas instanciei uma classe do tipo Appointment
+// 2. como o uuid agora é do model appointment, não preciso mais importar o uuid nesse arquivo
