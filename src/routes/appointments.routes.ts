@@ -6,7 +6,15 @@ import AppointmentsRepository from "../repositories/AppointmentsRepository"; // 
 const appointmentsRouter = Router();
 const appointmentsRepository = new AppointmentsRepository();
 
-// rota que terá informações repassadas
+// SoC: Separation of Concerns (Separação de Preocupações)
+// cada rota se preocupa com apenas uma coisa
+
+appointmentsRouter.get("/", (request, response) => {
+  const appointments = appointmentsRepository.all();
+
+  return response.json(appointments);
+});
+
 appointmentsRouter.post("/", (request, response) => {
   const { provider, date } = request.body;
 
@@ -31,5 +39,5 @@ export default appointmentsRouter;
 
 // mudanças: "A rota cada vez vai perdendo mais responsabilidades"
 // isso é desacoplamento de código -> Arquitetura de Software
-// 1. não precisei criar um objeto appointment, apenas instanciei uma classe do tipo Appointment
+// 1. não precisei criar um objeto appointment, apenas instanciei uma classe do tipo AppointmentsRepository
 // 2. como o uuid agora é do model appointment, não preciso mais importar o uuid nesse arquivo
