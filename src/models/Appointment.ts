@@ -4,20 +4,23 @@
 // os atributos devem ter uma linha em branco os separando
 // construtores
 
-import { uuid } from 'uuidv4';
+import { uuid } from "uuidv4";
+import { id } from "date-fns/locale";
 
 class Appointment {
-    id: string;
+  id: string;
 
-    provider: string;
+  provider: string;
 
-    date: Date;
+  date: Date;
 
-    constructor(provider: string, date: Date) {
-        this.id = uuid();
-        this.provider = provider;
-        this.date = date;
-    }
+  // não precisei de uma interface aqui, pois defini os parâmetros
+  // do construtor como a própria classe, omitindo o id (que é gerado automaticamente)
+  constructor({ provider, date }: Omit<Appointment, "id">) {
+    this.id = uuid();
+    this.provider = provider;
+    this.date = date;
+  }
 }
 
 // para disponibilizar a classe externamente

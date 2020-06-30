@@ -9,6 +9,9 @@ const appointmentsRepository = new AppointmentsRepository();
 // SoC: Separation of Concerns (Separação de Preocupações)
 // cada rota se preocupa com apenas uma coisa
 
+// DTO - Data Transfer Object
+// usar objetos para transferir dados entre arquivos
+
 appointmentsRouter.get("/", (request, response) => {
   const appointments = appointmentsRepository.all();
 
@@ -30,7 +33,10 @@ appointmentsRouter.post("/", (request, response) => {
       .json({ message: "This appointment is already booked." });
   }
 
-  const appointment = appointmentsRepository.create(provider, parsedDate);
+  const appointment = appointmentsRepository.create({
+    provider,
+    date: parsedDate, // importante especificar que é um date, se não dá erro
+  });
 
   return response.json(appointment);
 });

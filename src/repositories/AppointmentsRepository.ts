@@ -10,6 +10,12 @@
 import { isEqual } from "date-fns";
 import Appointment from "../models/Appointment";
 
+// DTO -> Aula 6, Data Transfer Object
+interface CreateAppointmentDTO {
+  provider: string;
+  date: Date;
+}
+
 class AppointmentsRepository {
   private appointments: Appointment[];
 
@@ -21,9 +27,12 @@ class AppointmentsRepository {
     return this.appointments;
   }
 
-  public create(provider: string, date: Date): Appointment {
-    // método padrão?
-    const appointment = new Appointment(provider, date);
+  // desestruturando os parâmetros para poder deixar o código melhor
+  // no sentido de, se eu precisar de mais uma informação para criar um agendamento,
+  // eu simplesmente altero o objeto (baseado em uma interface) -> CreateA
+  // antes: public create(provider: string, date: Date): Appointment {...}
+  public create({ provider, date }: CreateAppointmentDTO) {
+    const appointment = new Appointment({ provider, date });
 
     this.appointments.push(appointment);
 
