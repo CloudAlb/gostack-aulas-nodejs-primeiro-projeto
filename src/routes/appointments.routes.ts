@@ -1,16 +1,21 @@
 import { Router } from "express";
-import { startOfHour, parseISO, isEqual } from "date-fns"; // yarn add date-fns
+import { parseISO } from "date-fns"; // yarn add date-fns
 
 import AppointmentsRepository from "../repositories/AppointmentsRepository"; // não deve ser possível importar depois do cabeçalho
+import CreateAppointmentService from "../services/CreateAppointmentService";
 
 const appointmentsRouter = Router();
 const appointmentsRepository = new AppointmentsRepository();
 
-// SoC: Separation of Concerns (Separação de Preocupações)
-// cada rota se preocupa com apenas uma coisa
-
 // DTO - Data Transfer Object
 // usar objetos para transferir dados entre arquivos
+
+// SoC: Separation of Concerns (Separação de Preocupações)
+// cada rota se preocupa com apenas uma coisa
+// uso "services", regras de negócio, para diminuir esses concers
+// regras de negócio: consistência, especificações
+
+// Rota: receber uma requisição, chamar outro arquivo, devolver uma resposta
 
 appointmentsRouter.get("/", (request, response) => {
   const appointments = appointmentsRepository.all();
@@ -19,26 +24,26 @@ appointmentsRouter.get("/", (request, response) => {
 });
 
 appointmentsRouter.post("/", (request, response) => {
-  const { provider, date } = request.body;
+  try {
+    const { provider, date } = request.body;
 
-  const parsedDate = startOfHour(parseISO(date));
+    const parsedDate = parseISO(date);
 
-  const findAppointmentInSameDate = appointmentsRepository.findByDate(
-    parsedDate
-  );
+    const CreateAppointment = new CreateAppointmentService(
+      appointmentsRepository
+    );
 
-  if (findAppointmentInSameDate) {
-    return response
-      .status(400)
-      .json({ message: "This appointment is already booked." });
+    const appointment = CreateAppointment.execute({
+      date: parsedDate,
+      provider,
+    });
+    // por estar usando objeto, a ordem dos parâmetros não é importante
+
+    return response.json(appointment);
+  } catch (err) {
+    // caputra throw's dos métodos que o trecho do try chama
+    return response.status(400).json({ error: err.message });
   }
-
-  const appointment = appointmentsRepository.create({
-    provider,
-    date: parsedDate, // importante especificar que é um date, se não dá erro
-  });
-
-  return response.json(appointment);
 });
 
 export default appointmentsRouter;
